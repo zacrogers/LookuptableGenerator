@@ -8,6 +8,8 @@ def generateSine(length, signed):
     filename  = "sine{}_{}".format(length, is_signed)
     
     print(filename + ".h")
+    print("#ifndef {}".format(filename.upper()))
+    print("#def {}".format(filename.upper()))
     print("float {}[{}] = {{".format(filename, length))
     
     for i in range (length):
@@ -18,10 +20,11 @@ def generateSine(length, signed):
         print("{},".format(sample))
     
     print("};")
+    print("#endif")
     
     
 def getInput():
-    length = input("Enter number of samples:")
+    length = input("Enter number of samples(default:1024):")
     signed = input("Signed?(y/n):")
     
     if signed == "y":
@@ -34,3 +37,4 @@ def getInput():
     
 length, signed = getInput()
 generateSine(length, signed)
+
