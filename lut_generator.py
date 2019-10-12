@@ -1,13 +1,15 @@
 '''
   Generates lookup tables as c header files
 '''
-
-
 import numpy as np
 
+
 def generateSine(length, signed):
-    filename = "sinewave_{}.h".format(length)
-    print("float sineWave[{}] = {{".format(length))
+    is_signed = ("unsigned", "signed")[signed]
+    filename  = "sine{}_{}".format(length, is_signed)
+    
+    print(filename + ".h")
+    print("float {}[{}] = {{".format(filename, length))
     
     for i in range (length):
         sample = (np.sin(2*np.pi*i/length))
@@ -19,4 +21,4 @@ def generateSine(length, signed):
     print("};")
     
 
-generateSine(100, False)
+generateSine(256, True)
