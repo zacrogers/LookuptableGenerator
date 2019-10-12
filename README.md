@@ -1,2 +1,2 @@
 # LookuptableGenerator
-Generate lookup tables for microcontroller DAC output
+Generate lookup tables in c header files for use in microcontroller audio testing

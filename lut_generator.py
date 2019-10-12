@@ -1,13 +1,11 @@
-'''
-  Generates lookup tables as c header files
-'''
+"""
+  Generates lookup tables of waveforms as c header files
+"""
 import numpy as np
 import matplotlib.pyplot as plot
 
-'''
-    Generate c header with lookup table from array of waveform
-'''
 def generateTable(name, waveform, signed):
+    """ Generate c header with lookup table from array of waveform"""
     length = len(waveform)
     is_signed = ("unsigned", "signed")[signed]
     filename  = "{}{}_{}".format(name, length, is_signed)
@@ -37,6 +35,16 @@ def generateTable(name, waveform, signed):
 
     
 def generateSine(length, signed):
+    """ 
+        Generate one period of sine wave 
+    
+        Args:\n
+            \tlength (int)     : Number of samples to generate.
+            \tsigned (boolean) : Set sample values as signed or unsigned
+
+        Returns:\n
+            \tsine (list)    : List of samples representing one period of sine wave
+    """
     sine = []
     for i in range(length):
         sample = (np.sin((2*np.pi*i)/length))
@@ -48,27 +56,47 @@ def generateSine(length, signed):
     
     return sine
 
-def generateSquare(length, signed):
-    square = []
-    coeffs = [1, 3, 5, 7, 9, 11]
+def generateSquare(length, harmonics, signed):
+    """ 
+        Generate one period of square wave as list to given number of harmonics 
 
+        Args:\n
+            \tlength (int)     : Number of samples to generate.
+            \tharmonics (int)  : Number of harmonics to generate.
+            \tsigned (boolean) : Set sample values as signed or unsigned
+
+        Returns:\n
+            \tsquare (list)    : List of samples representing one period of square wave
+    """
+    square = []
     for i in range(length):
         sample = 0
 
-        for coeff in coeffs:
-            sample += np.sin(2*np.pi*i*coeff/length)/coeff
+        for h in range(harmonics):
+            if(h%2):
+                sample += np.sin(2*np.pi*i*h/length)/h
 
         square.append(sample)
     
     return square
 
+def mapVals(x, out_min, out_max):
+    """ 
+        Re-map range of list to new range\n
+        Args:\n
+            \tx(list)      : List to apply mapping to
+            \tout min(int) : New minumum value
+            \tout max(int) : New maximum value
 
-# def mapVals(x, in_min, in_max, out_min, out_max):
-#     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-
+        Returns:\n
+            \t(list)       : Returns list mapped to new range
+    """
+    return (x - min(x)) * (out_max - out_min) / (max(x) - min(x)) + out_min
 
 def getInput():
+    """ Get command line input to create c header, returns values as tuple """
     length = input("Enter number of samples(default:1024):")
+    w_type = input()
     signed = input("Signed?(y/n):")
     
     if signed == "y":
@@ -78,12 +106,3 @@ def getInput():
         
     return (int(length), signed)
     
-    
-# length, signed = getInput()
-generateTable("square", generateSquare(255, True), True)
-
-time = np.linspace(0,255, num=255)
-x = generateSquare(255, True)
-
-plot.plot(time, x)
-plot.show()
