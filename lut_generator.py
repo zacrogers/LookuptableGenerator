@@ -2,32 +2,69 @@
   Generates lookup tables as c header files
 '''
 import numpy as np
+import matplotlib.pyplot as plot
 
-def generateSine(length, signed):
+'''
+    Generate c header with lookup table from array of waveform
+'''
+def generateTable(name, waveform, signed):
+    length = len(waveform)
     is_signed = ("unsigned", "signed")[signed]
-    filename  = "sine{}_{}".format(length, is_signed)
+    filename  = "{}{}_{}".format(name, length, is_signed)
+
+    with open(f"{filename}.h", "w") as file:
+        file.write(f"#ifndef {filename.upper()}\n")
+        file.write(f"#define {filename.upper()}\n\n")
+        file.write("static const float {}[{}] = \n{{\n\t\t\t".format(filename, length))
     
-    # Filename
-    print(filename + ".h")
+        i = 0
+        for sample in waveform:
+            if signed:
+                sample = (sample+1)/2
+
+            if i != length-1:
+                file.write("{0:.4f},".format(sample))
+            else:
+                file.write("{0:.4f}".format(sample))
+                
+            if i%10 == 0:
+                file.write("\n\t\t\t")
+
+            i += 1
     
-    # Text to write to file
-    print("#ifndef {}".format(filename.upper()))
-    print("#def {}\n".format(filename.upper()))
-    print("float {}[{}] = {{".format(filename, length))
+        file.write("\n};\n")
+        file.write("#endif")
+
     
+def generateSine(length, signed):
+    sine = []
     for i in range(length):
         sample = (np.sin((2*np.pi*i)/length))
+
         if signed:
             sample = (sample+1)/2
-            
-        print("{},".format(sample))
+
+        sine.append(sample)
     
-    print("};")
-    print("#endif")
+    return sine
+
+def generateSquare(length, signed):
+    square = []
+    coeffs = [1, 3, 5, 7, 9, 11]
+
+    for i in range(length):
+        sample = 0
+
+        for coeff in coeffs:
+            sample += np.sin(2*np.pi*i*coeff/length)/coeff
+
+        square.append(sample)
     
-    
-def mapVals(x, in_min, in_max, out_min, out_max):
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    return square
+
+
+# def mapVals(x, in_min, in_max, out_min, out_max):
+#     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 def getInput():
@@ -42,6 +79,11 @@ def getInput():
     return (int(length), signed)
     
     
-length, signed = getInput()
-generateSine(length, signed)
+# length, signed = getInput()
+generateTable("square", generateSquare(255, True), True)
 
+time = np.linspace(0,255, num=255)
+x = generateSquare(255, True)
+
+plot.plot(time, x)
+plot.show()
