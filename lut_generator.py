@@ -19,13 +19,18 @@ def generateSine(length, signed):
     
     print("};")
     
+    
 def getInput():
     length = input("Enter number of samples:")
     signed = input("Signed?(y/n):")
-    if signed:
+    
+    if signed == "y":
         signed = True
+    else:
+        signed = False
+        
     return (int(length), signed)
     
     
-(length, signed) = getInput()
+length, signed = getInput()
 generateSine(length, signed)
