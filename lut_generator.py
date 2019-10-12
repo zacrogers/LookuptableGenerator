@@ -4,8 +4,21 @@
 import numpy as np
 import matplotlib.pyplot as plot
 
+
 def generateTable(name, waveform, signed):
-    """ Generate c header with lookup table from array of waveform"""
+    """ 
+        Generate c header with lookup table from array of waveform\n\n
+
+        header filename = {name}{waveform length}_{signed}.h
+
+        Args:\n
+            \tname (string)    : Number of samples to generate
+            \twaveform (list)  : Waveform to generate lookup table of
+            \tsigned (boolean) : Set sample values as signed or unsigned
+
+        Returns:\n
+            \tcreates c header file containing array of waveform values between 0 and 1   
+    """
     length = len(waveform)
     is_signed = ("unsigned", "signed")[signed]
     filename  = "{}{}_{}".format(name, length, is_signed)
@@ -15,15 +28,15 @@ def generateTable(name, waveform, signed):
         file.write(f"#define {filename.upper()}\n\n")
         file.write("static const float {}[{}] = \n{{\n\t\t\t".format(filename, length))
     
-        i = 0
+        i = 0 # To set linebreaks for array values
         for sample in waveform:
             if signed:
                 sample = (sample+1)/2
 
             if i != length-1:
-                file.write("{0:.4f},".format(sample))
+                file.write("{0:.2f},".format(sample))
             else:
-                file.write("{0:.4f}".format(sample))
+                file.write("{0:.2f}".format(sample))
                 
             if i%10 == 0:
                 file.write("\n\t\t\t")
@@ -56,6 +69,7 @@ def generateSine(length, signed):
     
     return sine
 
+
 def generateSquare(length, harmonics, signed):
     """ 
         Generate one period of square wave as list to given number of harmonics 
@@ -80,18 +94,20 @@ def generateSquare(length, harmonics, signed):
     
     return square
 
+
 def mapVals(x, out_min, out_max):
     """ 
         Re-map range of list to new range\n
         Args:\n
-            \tx(list)      : List to apply mapping to
-            \tout min(int) : New minumum value
-            \tout max(int) : New maximum value
+            \tx(list)  : List to apply mapping to
+            \tmin(int) : New minumum value
+            \tmax(int) : New maximum value
 
         Returns:\n
             \t(list)       : Returns list mapped to new range
     """
     return (x - min(x)) * (out_max - out_min) / (max(x) - min(x)) + out_min
+
 
 def getInput():
     """ Get command line input to create c header, returns values as tuple """
