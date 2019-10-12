@@ -6,13 +6,15 @@ num_samples = 255
 
 square = gen.generateSquare(num_samples, 10, True)
 sine   = gen.generateSine(num_samples, True)
+time   = np.linspace(0, num_samples, num=num_samples)
+x      = gen.mapVals(square, 0, 255)
 
-s = gen.mapVals(sine, 0, 255)
+c = gen.loadCsv("sine")
 
-gen.generateTable("sine", s, True)
+for i in c:
+    print(i)
+# gen.saveCsv("sine", sine)
 
-time = np.linspace(0, num_samples, num=num_samples)
-x    = gen.mapVals(square, 0, 255)
-
-plt.plot(time, x)
-plt.show()
+# gen.generateTable("sine", x, True)
+# plt.plot(time, x)
+# plt.show()

@@ -1,8 +1,10 @@
 """
-  Generates lookup tables of waveforms as c header files
+  Generates lookup tables of waveforms as c header files or save as csv files
 """
 import numpy as np
 import matplotlib.pyplot as plot
+import os
+import pandas as pd
 
 
 def generateTable(name, waveform, signed):
@@ -12,9 +14,9 @@ def generateTable(name, waveform, signed):
         header filename = {name}{waveform length}_{signed}.h
 
         Args:\n
-            \tname (string)    : Number of samples to generate
-            \twaveform (list)  : Waveform to generate lookup table of
-            \tsigned (boolean) : Set sample values as signed or unsigned
+            \tname     (string)  : Number of samples to generate
+            \twaveform (list)    : Waveform to generate lookup table of
+            \tsigned   (boolean) : Set sample values as signed or unsigned
 
         Returns:\n
             \tcreates c header file containing array of waveform values between 0 and 1   
@@ -46,8 +48,34 @@ def generateTable(name, waveform, signed):
         file.write("\n};\n")
         file.write("#endif")
 
-    
-def generateSine(length, signed):
+
+def saveCsv(name, vals):
+    """ 
+        Save list to csv file 
+
+        Args:\n
+            \tname (string) : Name of csv to save
+            \tvals (list)   : list to save as csv file
+    """
+    df  = pd.DataFrame(vals)
+    fname = f'{name}.csv'
+    df.to_csv(fname, index=False)
+
+
+def loadCsv(fname):
+    """ 
+        Load single column csv file and return as list 
+
+        Args:\n
+            \tfname (string) : Name of csv to load
+        Returns:\n
+            \t      (list)   : Return list of values in csv
+    """
+    data = pd.read_csv(f"{fname}.csv")
+    return data["0"].tolist()
+
+
+def generateSine(length=256, signed=True):
     """ 
         Generate one period of sine wave 
     
@@ -56,7 +84,7 @@ def generateSine(length, signed):
             \tsigned (boolean) : Set sample values as signed or unsigned
 
         Returns:\n
-            \tsine (list)    : List of samples representing one period of sine wave
+            \tsine   (list)    : List of samples representing one period of sine wave
     """
     sine = []
     for i in range(length):
@@ -70,17 +98,17 @@ def generateSine(length, signed):
     return sine
 
 
-def generateSquare(length, harmonics, signed):
+def generateSquare(length=256, harmonics=10, signed=True):
     """ 
         Generate one period of square wave as list to given number of harmonics 
 
         Args:\n
-            \tlength (int)     : Number of samples to generate.
-            \tharmonics (int)  : Number of harmonics to generate.
-            \tsigned (boolean) : Set sample values as signed or unsigned
+            \tlength    (int)     : Number of samples to generate.
+            \tharmonics (int)     : Number of harmonics to generate.
+            \tsigned    (boolean) : Set sample values as signed or unsigned
 
         Returns:\n
-            \tsquare (list)    : List of samples representing one period of square wave
+            \tsquare    (list)    : List of samples representing one period of square wave
     """
     square = []
     for i in range(length):
@@ -97,14 +125,14 @@ def generateSquare(length, harmonics, signed):
 
 def mapVals(x, out_min, out_max):
     """ 
-        Re-map range of list to new range\n
+        Re-map range of values in list to new range\n
         Args:\n
-            \tx(list)  : List to apply mapping to
-            \tmin(int) : New minumum value
-            \tmax(int) : New maximum value
+            \tx   (list) : List to apply mapping to
+            \tmin (int)  : New minumum value
+            \tmax (int)  : New maximum value
 
         Returns:\n
-            \t(list)       : Returns list mapped to new range
+            \t    (list) : Returns list mapped to new range
     """
     return (x - min(x)) * (out_max - out_min) / (max(x) - min(x)) + out_min
 
