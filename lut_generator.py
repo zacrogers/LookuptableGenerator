@@ -122,6 +122,15 @@ def generateSquare(length=256, harmonics=10, signed=True):
     
     return square
 
+def changeFreq(wave, scaling_factor=2):
+    new_wave = []
+    i = 0
+    for sample in wave:
+        if i%scaling_factor == 1:
+            new_wave.append(sample) 
+        i+=1
+
+    return new_wave
 
 def mapVals(x, out_min, out_max):
     """ 
