@@ -7,7 +7,7 @@ import os
 import pandas as pd
 
 
-def generateTable(name, waveform, signed):
+def generateHeader(name, waveform, signed):
     """ 
         Generate c header with lookup table from array of waveform\n\n
 
@@ -48,6 +48,19 @@ def generateTable(name, waveform, signed):
         file.write("\n};\n")
         file.write("#endif")
 
+def saveHex(name, vals):
+    """ 
+        Save list to hex file 
+
+        Args:\n
+            \tname (string) : Name of csv to save
+            \tvals (list)   : list to save as csv file
+    """
+    df  = pd.DataFrame(vals)
+    filename = f'{name}.hex'
+    with open(filename, "w") as file:
+        for sample in vals:
+            file.write(f"{hex(sample)}\n")
 
 def saveCsv(name, vals):
     """ 
@@ -97,6 +110,27 @@ def generateSine(length=256, signed=True):
     
     return sine
 
+def generateSineInt(length=256, signed=True, n_bits = 24):
+    """ 
+        Generate one period of sine wave 
+    
+        Args:\n
+            \tlength (int)     : Number of samples to generate.
+            \tsigned (boolean) : Set sample values as signed or unsigned
+
+        Returns:\n
+            \tsine   (list)    : List of samples representing one period of sine wave
+    """
+    sine = []
+    for i in range(length):
+        sample = (np.sin((2*np.pi*i)/length)) * ((2**n_bits) / 2)
+
+        if signed:
+            sample = (sample+(2**n_bits))/2
+
+        sine.append(int(sample))
+    
+    return sine
 
 def generateSquare(length=256, harmonics=10, signed=True):
     """ 
@@ -159,3 +193,9 @@ def getInput():
         
     return (int(length), signed)
     
+
+def upsample():
+    pass
+
+def downsample():
+    pass
