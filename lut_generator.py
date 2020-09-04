@@ -48,19 +48,79 @@ def generateHeader(name, waveform, signed):
         file.write("\n};\n")
         file.write("#endif")
 
-def saveHex(name, vals):
+def saveVhdlLut(name, vals, n_bits, n_samples):
     """ 
-        Save list to hex file 
+        Save waveform to vhdl file 
 
         Args:\n
-            \tname (string) : Name of csv to save
-            \tvals (list)   : list to save as csv file
+            \t name      (string) : Name of lut to save
+            \t vals      (list)   : list to save as vhdl file
+            \t n_bits    (int)    : bit depth
+            \t n_samples (list)   : list to save as vhdl file
     """
     df  = pd.DataFrame(vals)
-    filename = f'{name}.hex'
+    filename = f'{name}_lut.vhd'
+
+    row = 0
+    max_rows = 8
+    curr_samp = 0
+
     with open(filename, "w") as file:
+
+        # Write vhdl entity declaration stuff
+        file.write("library ieee;\n")
+        file.write("use ieee.std_logic_1164.all;\n")
+        file.write("use ieee.std_logic_unsigned.all;\n\n")
+
+        file.write(f"entity {name}_lut is\n\n")
+
+        file.write("port (\n")
+        file.write("\tclk      : in  std_logic;\n")
+        file.write("\ten       : in  std_logic;\n")
+        file.write(f"\taddr     : in  std_logic_vector({n_bits-1} downto 0);\n")
+        file.write(f"\t{name}_out  : out std_logic_vector({n_bits-1} downto 0)\n")
+        file.write(");\n\n")
+        file.write("end entity;\n\n\n")
+
+        file.write(f"architecture rtl of {name}_lut is\n\n")
+        file.write(f"type rom_type is array (0 to {n_samples}) of std_logic_vector ({n_bits-1}  downto 0);\n\n")
+        file.write(f"constant {name}_ROM : rom_type :=\n(\n")
+
         for sample in vals:
-            file.write(f"{hex(sample)}\n")
+            if(sample >= 0):
+                file.write(f"X\"{sample:06x}\"")
+            else:
+                file.write(f"X\"{((1 << n_bits) + sample):06x}\"")
+
+            # Put a comma after every value other than the last
+            if(curr_samp != n_samples-1):
+                file.write(",")
+
+            curr_samp += 1
+            row += 1
+
+            # Start new line
+            if(row == max_rows-1):
+                file.write("\n")
+                row = 0
+
+        file.write(");\n\n")
+
+        # Write vhdl architecture stuff
+        file.write("begin\n\n")
+
+        file.write("rom_select: process (clk)\n")
+        file.write("begin\n")
+        file.write("\tif clk'event and clk = '1' then\n")
+        file.write("\t\tif en = '1' then\n")
+        file.write(f"\t\t\t{name}_out <= {name}_ROM(conv_integer(addr));\n")
+        file.write("\t\tend if;\n")
+        file.write("\tend if;\n")
+        file.write("end process rom_select;\n")
+
+        file.write("end rtl;")
+
+
 
 def saveCsv(name, vals):
     """ 

@@ -2,7 +2,7 @@ import lut_generator as gen
 import numpy as np
 import matplotlib.pyplot as plt
 
-num_samples = 256
+num_samples = 4096
 
 square = gen.generateSquare(num_samples, 10, True)
 # sine   = gen.generateSine(num_samples, signed=False)
@@ -10,7 +10,7 @@ time   = np.linspace(0, num_samples, num=num_samples)
 x      = gen.mapVals(square, 0, 255)
 
 sine   = gen.generateSineInt(num_samples, signed=False)
-gen.saveHex("sine", sine)
+gen.saveVhdlLut("sin", sine, 24, num_samples)
 
 # gen.saveCsv("sine", sine)
 # c = gen.loadCsv("sine")
