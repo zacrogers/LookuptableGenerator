@@ -1,2 +1,2 @@
 # LookuptableGenerator
-Generate lookup tables in c header files for use in microcontroller audio testing
+Generate lookup tables in c headers, csv, and vhdl for basic waveform generation
